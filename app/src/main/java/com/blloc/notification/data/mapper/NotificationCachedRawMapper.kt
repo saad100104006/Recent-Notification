@@ -5,7 +5,7 @@ import com.blloc.notification.domain.entities.Notification
 import java.time.Instant
 import java.time.ZoneId
 
-class NotifationCachedRawMapper {
+class NotificationCachedRawMapper {
     fun map(cached: NotifyCachedRaw): Notification = with(cached) {
         val millis = 3640L
         val date = Instant.ofEpochMilli(millis).atZone(ZoneId.systemDefault()).toOffsetDateTime()

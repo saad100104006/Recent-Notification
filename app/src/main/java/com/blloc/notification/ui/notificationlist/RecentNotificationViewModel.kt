@@ -38,6 +38,25 @@ class RecentNotificationViewModel(
 
     init {
         viewModelScope.launch {
+            notificationRepository.observeActiveNotification()
+                .flatMapLatest { list ->
+                    filterState.map {
+                        list.applyFilter(it) to it
+
+                    }
+                }
+                .collect { (list, filter) ->
+                    Timber.i("observeActive notification: $list")
+                    updateState {
+                        copy(
+                            activeNotifications = list,
+                            isEmpty = list.isEmpty(),
+                            currentFilter = filter
+                        )
+                    }
+                }
+        }
+        viewModelScope.launch {
             notificationRepository.observeNotification()
                 .flatMapLatest { list ->
                     filterState.map {
@@ -78,31 +97,18 @@ class RecentNotificationViewModel(
 
     data class UiState(
         val notifications: List<Notification> = emptyList(),
+        val activeNotifications: List<Notification> = emptyList(),
         val isEmpty: Boolean = true,
         val currentFilter: FilterNotification = FilterNotification.ALL,
         val isTrackerEnable: Boolean = false
     )
 
     private fun List<Notification>.applyFilter(filter: FilterNotification): List<Notification> {
-        val now = LocalDateTime.now()
+
+        Timber.i("active notifications: $this")
         return when (filter) {
             FilterNotification.ALL -> this
-            FilterNotification.ACTIVE -> {
-
-                val activeN = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    notificationManager.activeNotifications
-                } else {
-                    return listOf();
-                };
-                Timber.d("active notifications: ${activeN}")
-                return activeN.map { n -> Notification(
-                    key = n.key,
-                    appPackage = n.opPkg,
-                    text = n.notification.tickerText?.toString() ?: "unknown",
-                    date = n.postTime.toOffsetDateTime().toLocalDateTime()
-                ) }
-            }
-
+            FilterNotification.ACTIVE -> this
         }
 
     }

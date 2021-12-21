@@ -3,7 +3,8 @@ package com.blloc.notification.di
 import android.app.NotificationManager
 import android.app.Service
 import com.blloc.notification.data.db.NotificationRoomDatabase
-import com.blloc.notification.data.mapper.NotifationCachedRawMapper
+import com.blloc.notification.data.mapper.ActiveNotificationCachedRawMapper
+import com.blloc.notification.data.mapper.NotificationCachedRawMapper
 import com.blloc.notification.data.preferences.Preferences
 import com.blloc.notification.data.repository.NotificationRepositoryImpl
 import com.blloc.notification.domain.repository.NotificationRepository
@@ -18,8 +19,8 @@ val dataModule = module {
     single { NotificationRoomDatabase.create(get()) }
 
     factory<NotificationRepository> {
-        val notifyDao = get<NotificationRoomDatabase>().notifyDao()
-        NotificationRepositoryImpl(notifyDao, NotifationCachedRawMapper())
+        val notificationDao = get<NotificationRoomDatabase>().notificationDao()
+        NotificationRepositoryImpl(notificationDao, NotificationCachedRawMapper(), ActiveNotificationCachedRawMapper())
     }
 
     factory {

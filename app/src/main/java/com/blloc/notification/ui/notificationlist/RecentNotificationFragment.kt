@@ -33,6 +33,7 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import timber.log.Timber
 
 private const val ENABLED_NOTIFICATION_LISTENERS = "enabled_notification_listeners"
 private const val ACTION_NOTIFICATION_LISTENER_SETTINGS =
@@ -129,8 +130,11 @@ class RecentNotificationFragment : Fragment() {
 
     private fun render(state: RecentNotificationViewModel.UiState) {
         binding.emptyView.root.isVisible = state.isEmpty
-        handleNotifications(state.notifications)
         currentFilter = state.currentFilter
+        when(currentFilter) {
+            FilterNotification.ALL -> handleNotifications(state.notifications)
+            FilterNotification.ACTIVE -> handleNotifications(state.activeNotifications)
+        }
 
         binding.trackerStartButton.isVisible = !state.isTrackerEnable
         binding.trackerStopButton.isVisible = state.isTrackerEnable
@@ -152,6 +156,7 @@ class RecentNotificationFragment : Fragment() {
     }
 
     private fun handleNotifications(list: List<Notification>) {
+        Timber.i("handle notification: $list")
         notifyAdapter.submitList(list) {
             if (binding.recycler.computeVerticalScrollOffset() == 0) {
                 binding.recycler.scrollToPosition(0)

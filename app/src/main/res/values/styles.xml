@@ -20,15 +20,4 @@
         <item name="backgroundTint">?colorAccent</item>
         <item name="android:textColor">@color/black</item>
     </style>
-
-    <declare-styleable name="ColorStateListItem">
-        <!-- Base color for this state. -->
-        <attr name="android:color"/>
-        <!-- Alpha multiplier applied to the base color. -->
-        <attr format="float" name="alpha"/>
-        <attr name="android:alpha"/>
-        <!-- Perceptual luminance applied to the base color. From 0 to 100. -->
-        <attr format="float" name="lStar"/>
-    </declare-styleable>
-
 </resources>

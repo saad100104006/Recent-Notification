@@ -5,8 +5,8 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import java.time.OffsetDateTime
 
-@Entity(tableName = "notifications")
-class NotifyCachedRaw(
+@Entity(tableName = "active_notifications")
+class ActiveNotificationCachedRaw(
     @PrimaryKey
     @ColumnInfo(name = "key")
     val key: String,

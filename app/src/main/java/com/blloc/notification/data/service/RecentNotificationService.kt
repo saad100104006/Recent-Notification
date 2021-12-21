@@ -25,6 +25,27 @@ class RecentNotificationService : NotificationListenerService() {
         handleNotification(sbn)
     }
 
+    override fun onNotificationRemoved(sbn: StatusBarNotification?) {
+        super.onNotificationRemoved(sbn)
+        handleRemoveNotification(sbn)
+    }
+
+    private fun handleRemoveNotification(sbn: StatusBarNotification?) {
+        if (!preferences.notificationTrackerEnable) return
+
+        Timber.d("removed notification: ${sbn.toString()}")
+        scope.launch {
+            checkNotNull(sbn)
+            repository.deleteActiveNotification(
+                key = sbn.key,
+                appPackage = sbn.opPkg,
+                text = sbn.notification.tickerText?.toString() ?: "unknown",
+                date = sbn.postTime
+            )
+        }
+
+    }
+
     private fun handleNotification(sbn: StatusBarNotification?) {
         if (!preferences.notificationTrackerEnable) return
 
@@ -32,7 +53,13 @@ class RecentNotificationService : NotificationListenerService() {
         scope.launch {
             checkNotNull(sbn)
             if (sbn.notification.tickerText != null) {
-                repository.storeNotify(
+                repository.storeNotification(
+                    key = sbn.key,
+                    appPackage = sbn.opPkg,
+                    text = sbn.notification.tickerText?.toString() ?: "unknown",
+                    date = sbn.postTime
+                )
+                repository.storeActiveNotification(
                     key = sbn.key,
                     appPackage = sbn.opPkg,
                     text = sbn.notification.tickerText?.toString() ?: "unknown",
